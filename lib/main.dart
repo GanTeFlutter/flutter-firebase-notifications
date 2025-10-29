@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_base_start/future/home/home_view.dart';
+import 'package:flutter_base_start/future/screens/screens.dart';
 import 'package:flutter_base_start/future/splash/splash_view.dart';
 import 'package:flutter_base_start/future/splash/version_update.dart';
 import 'package:flutter_base_start/product/init/app_initialize.dart';
@@ -7,6 +8,7 @@ import 'package:flutter_base_start/product/init/state_initialize.dart';
 import 'package:go_router/go_router.dart';
 
 part 'product/navigation/app_gorouter.dart';
+
 
 Future<void> main() async {
   await AppInitialize().make();
@@ -20,10 +22,27 @@ class _MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
-      title: 'ColorCraftPro',
+      title: 'fcm',
       // theme: AppLightTheme().themeData,
       // darkTheme: AppDarkTheme().themeData,
+  
       routerConfig: _router,
+      
     );
   }
 }
+
+// class _MyApp extends StatelessWidget {
+//   const _MyApp();
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return const MaterialApp(
+//       debugShowCheckedModeBanner: false,
+//       title: 'fcm',
+//       // theme: AppLightTheme().themeData,
+//       // darkTheme: AppDarkTheme().themeData,
+//       home: MyWidget(),
+//     );
+//   }
+// }
