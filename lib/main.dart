@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_base_start/future/home/home_view.dart';
 import 'package:flutter_base_start/future/splash/splash_view.dart';
+import 'package:flutter_base_start/future/splash/version_update.dart';
 import 'package:flutter_base_start/product/init/app_initialize.dart';
 import 'package:flutter_base_start/product/init/state_initialize.dart';
 import 'package:go_router/go_router.dart';

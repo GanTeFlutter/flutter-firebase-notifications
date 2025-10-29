@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_base_start/product/state/cubit/deneme_cubit.dart';
+import 'package:flutter_base_start/future/splash/cubit/version_control_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 ///[StateInitialize] is a widget that initializes the state management
@@ -11,7 +11,11 @@ class StateInitialize extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
-      providers: [BlocProvider(create: (context) => DenemeCubit())],
+      providers: [
+        BlocProvider(
+          create: (context) => VersionControlCubit(VersionControlService()),
+        ),
+      ],
       child: child,
     );
   }

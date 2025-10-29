@@ -15,6 +15,13 @@ final GoRouter _router = GoRouter(
             return const HomeView();
           },
         ),
+        GoRoute(
+          path: '/versionUpdate',
+          name: 'VersionUpdate',
+          builder: (BuildContext context, GoRouterState state) {
+            return const VersionUpdate();
+          },
+        ),
       ],
     ),
   ],

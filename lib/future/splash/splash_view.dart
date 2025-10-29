@@ -1,33 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_base_start/future/splash/cubit/version_control_cubit.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-class SplashView extends StatefulWidget {
+class SplashView extends StatelessWidget {
   const SplashView({super.key});
 
   @override
-  State<SplashView> createState() => _SplashViewState();
-}
-
-class _SplashViewState extends State<SplashView> {
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('SplashView')),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          spacing: 10,
-          children: [
-            ElevatedButton(
-              onPressed: () {
-                context.goNamed('HomeView');
-              },
-              child: const Text('Go to HomeView'),
-            ),
-            ElevatedButton(onPressed: () {}, child: const Text('SplashView')),
-            ElevatedButton(onPressed: () {}, child: const Text('SplashView')),
-            const Text('SplashView'),
-          ],
+      body: BlocListener<VersionControlCubit, VersionControlState>(
+        listener: (context, state) {
+          if (state is VersionControlLoaded) {
+            context.goNamed('HomeView');
+          } else if (state is VersionControlError) {
+            context.goNamed('VersionUpdate');
+          }
+        },
+        child: const Center(
+          child: CircularProgressIndicator(),
         ),
       ),
     );
