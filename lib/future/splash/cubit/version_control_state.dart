@@ -8,8 +8,8 @@ final class VersionControlInitial extends VersionControlState {}
 final class VersionControlLoading extends VersionControlState {}
 
 final class VersionControlLoaded extends VersionControlState {
-  VersionControlLoaded(this.version);
-  final String version;
+  VersionControlLoaded({required this.isUpdateRequired});
+  final bool isUpdateRequired;
 }
 
 final class VersionControlError extends VersionControlState {

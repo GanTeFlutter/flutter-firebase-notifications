@@ -25,8 +25,7 @@ class _MyApp extends StatelessWidget {
       title: 'fcm',
       // theme: AppLightTheme().themeData,
       // darkTheme: AppDarkTheme().themeData,
-  
-      routerConfig: _router,
+        routerConfig: _router,
       
     );
   }

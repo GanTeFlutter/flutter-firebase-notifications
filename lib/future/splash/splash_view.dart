@@ -12,9 +12,9 @@ class SplashView extends StatelessWidget {
       body: BlocListener<VersionControlCubit, VersionControlState>(
         listener: (context, state) {
           if (state is VersionControlLoaded) {
-            context.goNamed('HomeView');
-          } else if (state is VersionControlError) {
-            context.goNamed('VersionUpdate');
+            state.isUpdateRequired
+                ? context.goNamed('HomeView')
+                : context.goNamed('VersionUpdate');
           }
         },
         child: const Center(

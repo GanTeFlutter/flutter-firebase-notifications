@@ -14,8 +14,8 @@ class VersionControlCubit extends Cubit<VersionControlState> {
     emit(VersionControlLoading());
 
     try {
-      final version = await _service.checkVersion();
-      emit(VersionControlLoaded(version));
+      final isUpdateRequired = await _service.checkVersion();
+      emit(VersionControlLoaded(isUpdateRequired: isUpdateRequired));
     } on Exception catch (e) {
       emit(VersionControlError(e.toString()));
     }
@@ -23,8 +23,8 @@ class VersionControlCubit extends Cubit<VersionControlState> {
 }
 
 class VersionControlService {
-  Future<String> checkVersion() async {
+  Future<bool> checkVersion() async {
     await Future<void>.delayed(const Duration(seconds: 2));
-    return '1.0.0';
+    return true;
   }
 }

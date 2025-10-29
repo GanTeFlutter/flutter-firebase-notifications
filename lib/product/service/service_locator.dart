@@ -28,4 +28,6 @@ extension ServiceLocator on GetIt {
 
   SharedPreferencesService get sharedprefs =>
       locator<SharedPreferencesService>();
+
+  FirebaseService get firebaseService => locator<FirebaseService>();
 }

@@ -21,7 +21,7 @@ final GoRouter _router = GoRouter(
       ],
     ),
     GoRoute(
-      path: 'home',
+      path: '/home',
       name: 'HomeView',
       builder: (BuildContext context, GoRouterState state) {
         return const HomeView();

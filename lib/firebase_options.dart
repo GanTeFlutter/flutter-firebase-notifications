@@ -49,5 +49,20 @@ class DefaultFirebaseOptions {
     }
   }
 
+  static const FirebaseOptions android = FirebaseOptions(
+    apiKey: 'AIzaSyBMmf7S1Xtd_OU_rVN83RH1nRAbkcDHOTU',
+    appId: '1:821844841955:android:6dd5b44f7292272cc7bcd6',
+    messagingSenderId: '821844841955',
+    projectId: 'f-c-m-b9ef7',
+    storageBucket: 'f-c-m-b9ef7.firebasestorage.app',
+  );
 
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyCoeD47W4lDTINWoQAhkaeSAdz9zUlcA74',
+    appId: '1:821844841955:ios:4c5ef5c70c63e885c7bcd6',
+    messagingSenderId: '821844841955',
+    projectId: 'f-c-m-b9ef7',
+    storageBucket: 'f-c-m-b9ef7.firebasestorage.app',
+    iosBundleId: 'com.example.flutterBaseStart',
+  );
 }
