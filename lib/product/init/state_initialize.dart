@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_base_start/future/splash/cubit/version_control_cubit.dart';
+import 'package:flutter_base_start/product/service/notification/bloc/notification_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 ///[StateInitialize] is a widget that initializes the state management
@@ -14,6 +15,11 @@ class StateInitialize extends StatelessWidget {
       providers: [
         BlocProvider(
           create: (context) => VersionControlCubit(VersionControlService()),
+        ),
+        BlocProvider(
+          create: (context) => NotificationBloc(
+     
+          ),
         ),
       ],
       child: child,

@@ -36,6 +36,8 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   }
 }
 
+
+
 class FirebaseService {
   static final FirebaseMessaging _messaging = FirebaseMessaging.instance;
 
@@ -45,12 +47,12 @@ class FirebaseService {
 
     // Bildirim izni isteme
     await notificationPermission();
-    
+
     // Token alma
     await _getToken();
 
     // Ön planda mesaj dinleme
-    _listenForegroundMessages();
+    listenForegroundMessages();
 
     // Bildirim etkileşimlerini ayarla
     await _setupInteractedMessage();
@@ -73,7 +75,7 @@ class FirebaseService {
   }
 
   //Ön planda mesaj dinlemes
-  void _listenForegroundMessages() {
+  void listenForegroundMessages() {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       debugPrint('--📲 Ön planda mesaj alındı!');
       debugPrint('--🔹 Veri: ${message.data}');
@@ -81,6 +83,10 @@ class FirebaseService {
         '--🔹 Bildirim: ${message.notification?.title} - ${message.notification?.body}',
       );
     });
+  }
+
+  Stream<RemoteMessage> get listenForegroundMessages2 {
+    return FirebaseMessaging.onMessage;
   }
 
   //uygulama durumuna göre bildirim etkileşimlerini ayarla
@@ -117,3 +123,34 @@ class FirebaseService {
     }
   }
 }
+
+/*
+📱 FCM'deki 3 Durum:
+1. Foreground (Uygulama Açık/Kullanımda) ✅
+
+Bildirim otomatik olarak tepsiye DÜŞMEZ
+FirebaseMessaging.onMessage.listen() ile yakalarsınız
+Siz manuel olarak ne yapacağınıza karar verirsiniz:
+
+Uygulama içi dialog/snackbar gösterebilirsiniz
+VEYA flutter_local_notifications ile bildirim tepsisine düşürebilirsiniz
+Veya hiçbir şey yapmayabilirsiniz
+
+
+
+2. Background (Uygulama Arka Planda) 📴
+
+Bildirim otomatik olarak tepsiye DÜŞER
+Kullanıcı bildirime tıklarsa: FirebaseMessaging.onMessageOpenedApp.listen() tetiklenir
+Arka plan handler'ı (firebaseMessagingBackgroundHandler) çalışır ama bildirim gösterimi sistem tarafından yapılır
+
+3. Terminated (Uygulama Kapalı) 🔴
+
+Bildirim otomatik olarak tepsiye DÜŞER
+Kullanıcı bildirime tıklayıp uygulamayı açarsa: getInitialMessage() ile yakalarsınız
+Arka plan handler'ı çalışır
+
+⚠️ Önemli Not:
+Background ve Terminated durumlarında bildirim otomatik düşer ANCAK bunun için gelen mesajın notification alanı dolu olmalı! Sadece data gönderirseniz bildirim düşmez.
+
+*/

@@ -3,12 +3,15 @@ import 'package:flutter_base_start/future/home/home_view.dart';
 import 'package:flutter_base_start/future/screens/screens.dart';
 import 'package:flutter_base_start/future/splash/splash_view.dart';
 import 'package:flutter_base_start/future/splash/version_update.dart';
+import 'package:flutter_base_start/product/constant/app_globalkey.dart';
 import 'package:flutter_base_start/product/init/app_initialize.dart';
+import 'package:flutter_base_start/product/init/app_listener.dart';
 import 'package:flutter_base_start/product/init/state_initialize.dart';
 import 'package:go_router/go_router.dart';
 
 part 'product/navigation/app_gorouter.dart';
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 Future<void> main() async {
   await AppInitialize().make();
@@ -25,8 +28,7 @@ class _MyApp extends StatelessWidget {
       title: 'fcm',
       // theme: AppLightTheme().themeData,
       // darkTheme: AppDarkTheme().themeData,
-        routerConfig: _router,
-      
+      routerConfig: _router,
     );
   }
 }

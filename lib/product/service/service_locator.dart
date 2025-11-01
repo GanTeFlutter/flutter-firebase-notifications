@@ -1,4 +1,4 @@
-import 'package:flutter_base_start/product/service/services/firebase_fcm.dart';
+import 'package:flutter_base_start/product/service/fcm_service/firebase_fcm.dart';
 import 'package:flutter_base_start/product/service/services/logger_service.dart';
 import 'package:flutter_base_start/product/service/services/shared_preferences_service.dart';
 
@@ -11,16 +11,17 @@ Future<void> setupLocator() async {
   await _initializeServices();
 }
 
-Future<void> _initializeServices() async {
-  await locator<SharedPreferencesService>().initialize();
-  await locator<FirebaseService>().initialize();
-}
-
+//önce singletonlar kaydedilir
 void _registerSingletons() {
   locator
     ..registerSingleton<LoggerService>(LoggerService())
     ..registerSingleton<SharedPreferencesService>(SharedPreferencesService())
     ..registerSingleton<FirebaseService>(FirebaseService());
+}
+
+Future<void> _initializeServices() async {
+  await locator<SharedPreferencesService>().initialize();
+  await locator<FirebaseService>().initialize();
 }
 
 extension ServiceLocator on GetIt {
