@@ -43,11 +43,11 @@ class FirebaseService {
     // Arka planda mesaj dinleme
     FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
-    // Token alma
-    await _getToken();
-
     // Bildirim izni isteme
     await notificationPermission();
+    
+    // Token alma
+    await _getToken();
 
     // Ön planda mesaj dinleme
     _listenForegroundMessages();
