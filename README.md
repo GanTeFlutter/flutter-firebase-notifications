@@ -34,9 +34,6 @@ Future&lt;void&gt; _firebaseMessagingBackgroundHandler(RemoteMessage message) as
   debugPrint('Handling a background message: ${message.messageId}');
 }
 </code></pre>
-<p>
-  ⚠️ Bu fonksiyonun <code>main.dart</code> içinde şu şekilde kaydedilmesi gerekir:
-</p>
 <pre><code class="language-dart">
 FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 </code></pre>
