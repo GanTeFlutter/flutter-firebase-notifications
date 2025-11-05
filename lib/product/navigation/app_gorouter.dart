@@ -10,7 +10,6 @@ final GoRouter _router = GoRouter(
         return const SplashView();
       },
     ),
-
     // Kapsayıcı route - tüm diğer sayfaları sarar
     ShellRoute(
       builder: (context, state, child) {

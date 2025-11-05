@@ -1,70 +1,55 @@
-import 'package:firebase_core/firebase_core.dart';
+import 'dart:convert';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_base_start/main.dart';
+import 'package:flutter_base_start/product/constant/app_globalkey.dart';
+// ignore: library_prefixes
+
+import 'package:flutter_base_start/product/service/service_locator.dart';
 import 'package:go_router/go_router.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-class PrefKeys {
-  static const lastMessageData = 'last_message_data';
-  static const lastMessageTitle = 'last_message_title';
-  static const lastMessageBody = 'last_message_body';
-  static const lastMessageTime = 'last_message_time';
+mixin FirebaseCloudMessageFunctions {
+  /// 🔧 FCM başlatma
+  Future<void> initializeFCM();
+
+  /// 🔔 Bildirim izni isteme
+  Future<String> requestNotificationPermission();
+
+  /// 🎧 Ön planda gelen mesajları dinleme
+  Future<void> listenForegroundMessages();
+
+  /// 🔙 Arka planda bildirime tıklanma durumunu işleme
+  Future<void> handleMessageOpenedApp();
+
+  /// 🔑 Cihaz tokenini alma
+  Future<String> fetchDeviceToken();
 }
 
-/// Top-level ve entry-point olarak işaretlenmeli
-/// Bu, arka planda mesaj dinleme
-@pragma('vm:entry-point')
-Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  try {
-    await Firebase.initializeApp();
-    final prefs = await SharedPreferences.getInstance();
-    final dataStr = message.data.isNotEmpty
-        ? message.data.toString()
-        : 'No Data';
-    final title = message.notification?.title ?? 'No Title';
-    final body = message.notification?.body ?? 'No Body';
-    final time = DateTime.now().toIso8601String();
-
-    // Kaydet
-    await prefs.setString(PrefKeys.lastMessageData, dataStr);
-    await prefs.setString(PrefKeys.lastMessageTitle, title);
-    await prefs.setString(PrefKeys.lastMessageBody, body);
-    await prefs.setString(PrefKeys.lastMessageTime, time);
-  } on Exception catch (e) {
-    throw Exception('Error in background message handler: $e');
-  }
-}
-
-
-
-class FirebaseService {
+class FirebaseService with FirebaseCloudMessageFunctions {
   static final FirebaseMessaging _messaging = FirebaseMessaging.instance;
 
-  Future<void> initialize() async {
-    // Arka planda mesaj dinleme
+  /// 🔧 FCM başlatma
+  @override
+  Future<void> initializeFCM() async {
     FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
-
-    // Bildirim izni isteme
-    await notificationPermission();
-
-    // Token alma
-    await _getToken();
-
-    // Ön planda mesaj dinleme
-    listenForegroundMessages();
-
-    // Bildirim etkileşimlerini ayarla
-    await _setupInteractedMessage();
+    await handleMessageOpenedApp();
+    await requestNotificationPermission();
+    await fetchDeviceToken();
+    await listenForegroundMessages();
   }
 
-  //Bildirim izni isteme
-  Future<String> notificationPermission() async {
+  /// 🔔 Bildirim izni isteme
+  @override
+  Future<String> requestNotificationPermission() async {
     final settings = await _messaging.getNotificationSettings();
+
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
       return 'İzin zaten verilmiş';
     }
+
     final newSettings = await _messaging.requestPermission();
+
     if (newSettings.authorizationStatus == AuthorizationStatus.authorized) {
       return 'İzin verildi';
     } else if (newSettings.authorizationStatus == AuthorizationStatus.denied) {
@@ -74,83 +59,69 @@ class FirebaseService {
     }
   }
 
-  //Ön planda mesaj dinlemes
-  void listenForegroundMessages() {
+  /// 🎧 Ön planda gelen mesajları dinleme
+  @override
+  Future<void> listenForegroundMessages() async {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      debugPrint('--📲 Ön planda mesaj alındı!');
-      debugPrint('--🔹 Veri: ${message.data}');
-      debugPrint(
-        '--🔹 Bildirim: ${message.notification?.title} - ${message.notification?.body}',
+      debugPrint('📩 Foreground mesaj alındı: ${message.notification?.title}');
+
+      // Mesaj verisini kaydet
+      locator.sharedprefs.setString(
+        'last_message_data',
+        jsonEncode(message.data),
       );
+
+      // Bildirim başlık ve gövdesini al
+      final title = message.notification?.title ?? 'Yeni Bildirim';
+      final body = message.notification?.body ?? 'İçerik yok';
+
+      // UI üzerinde göster (örnek: SnackBar)
     });
   }
 
-  Stream<RemoteMessage> get listenForegroundMessages2 {
-    return FirebaseMessaging.onMessage;
+  /// 🔙 Arka planda bildirime tıklanma durumunu işleme
+  @override
+  Future<void> handleMessageOpenedApp() async {
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      debugPrint('🔔 Bildirime tıklandı: ${message.data}');
+
+      locator.sharedprefs.setString(
+        'last_message_data',
+        jsonEncode(message.data),
+      );
+
+      final navigateHome = message.data['messageData'];
+      if (navigateHome != null) {
+        locator.sharedprefs.setString(
+          'last_navigate_home',
+          navigateHome.toString(),
+        );
+        debugPrint('➡️ Saved navigateHome: $navigateHome');
+      }
+
+      final ctx = AppKeys.navigatorKey.currentContext;
+      if (ctx != null && ctx.mounted && navigateHome != null) {
+        debugPrint('➡️ Navigating to: $navigateHome');
+        ctx.goNamed('$navigateHome');
+      }
+    });
   }
 
-  //uygulama durumuna göre bildirim etkileşimlerini ayarla
-  Future<void> _setupInteractedMessage() async {
-    // Uygulama kapalıyken bildirime tıklayıp açıldı mı?
-    final initialMessage = await _messaging.getInitialMessage();
-    if (initialMessage != null) {
-      _handleMessage(initialMessage);
-    }
-    // Arka plandayken bildirime tıklanırsa
-    FirebaseMessaging.onMessageOpenedApp.listen(_handleMessage);
-  }
-
-  // Bildirime tıklanma durumunda hangi sayfaya gidileceği
-  void _handleMessage(RemoteMessage message) {
-    final context = navigatorKey.currentContext;
-    if (context == null) return;
-    final type = message.data['type'];
-    if (type == 'chat') {
-      context.goNamed('Screen1');
-    } else if (type == 'order') {
-      context.goNamed('Screen2');
-    }
-  }
-
-  //firebasten device özelinde mesaj gönderebilmek için tokeni aldık
-  //alınan cihaza özgüdür
-  Future<void> _getToken() async {
+  /// 🔑 Cihaz tokenini alma
+  @override
+  Future<String> fetchDeviceToken() async {
     final token = await _messaging.getToken();
     if (token != null) {
-      debugPrint('--🔑 FCM Token: $token');
+      debugPrint('** FCM Token: $token');
+      return token;
     } else {
-      debugPrint('--❌ FCM Token alınamadı');
+      return 'Token alınamadı';
     }
   }
 }
 
-/*
-📱 FCM'deki 3 Durum:
-1. Foreground (Uygulama Açık/Kullanımda) ✅
-
-Bildirim otomatik olarak tepsiye DÜŞMEZ
-FirebaseMessaging.onMessage.listen() ile yakalarsınız
-Siz manuel olarak ne yapacağınıza karar verirsiniz:
-
-Uygulama içi dialog/snackbar gösterebilirsiniz
-VEYA flutter_local_notifications ile bildirim tepsisine düşürebilirsiniz
-Veya hiçbir şey yapmayabilirsiniz
-
-
-
-2. Background (Uygulama Arka Planda) 📴
-
-Bildirim otomatik olarak tepsiye DÜŞER
-Kullanıcı bildirime tıklarsa: FirebaseMessaging.onMessageOpenedApp.listen() tetiklenir
-Arka plan handler'ı (firebaseMessagingBackgroundHandler) çalışır ama bildirim gösterimi sistem tarafından yapılır
-
-3. Terminated (Uygulama Kapalı) 🔴
-
-Bildirim otomatik olarak tepsiye DÜŞER
-Kullanıcı bildirime tıklayıp uygulamayı açarsa: getInitialMessage() ile yakalarsınız
-Arka plan handler'ı çalışır
-
-⚠️ Önemli Not:
-Background ve Terminated durumlarında bildirim otomatik düşer ANCAK bunun için gelen mesajın notification alanı dolu olmalı! Sadece data gönderirseniz bildirim düşmez.
-
-*/
+/// 📦 Arka planda gelen mesajı işleme
+@pragma('vm:entry-point')
+Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  debugPrint('📨 Arka planda mesaj alındı: ${message.data}');
+}

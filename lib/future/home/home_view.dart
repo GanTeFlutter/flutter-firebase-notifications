@@ -1,6 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_base_start/future/home/deneme.dart';
 import 'package:flutter_base_start/product/service/notification/bloc/notification_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vibration/vibration.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -27,7 +31,39 @@ class _HomeViewState extends State<HomeView> {
               },
               child: const Text('Send Notification Message'),
             ),
-            const Text('HomeView'),
+            ElevatedButton(
+              onPressed: () {
+                const fakeToken =
+                    'dQw4w9WgXcQ-FAKE-TOKEN-1234567dQw4w9WgXcQ890dQw4w9WgXcQ123dQw4w9WgXcQ456789012345678dQw4w9WgXcQ901234567890dQw4w9WgXcQ1234dQw4w9WgXcQ567890';
+                debugPrint('-- 🔑 Fake Token: $fakeToken');
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blueAccent,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: const Text(
+                '--FCM Token:',
+                style: TextStyle(color: Colors.white, fontSize: 16),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                unawaited(
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const Deneme(),
+                    ),
+                  ),
+                );
+              },
+              child: const Text(' Go to Deneme'),
+            ),
           ],
         ),
       ),

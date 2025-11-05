@@ -21,7 +21,7 @@ void _registerSingletons() {
 
 Future<void> _initializeServices() async {
   await locator<SharedPreferencesService>().initialize();
-  await locator<FirebaseService>().initialize();
+  await locator<FirebaseService>().initializeFCM();
 }
 
 extension ServiceLocator on GetIt {
